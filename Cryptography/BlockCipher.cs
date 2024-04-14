@@ -2,20 +2,20 @@
 
 public abstract class BlockCipher : Cipher<byte[]>
 {
-    protected override void ProcessFile(string pathFrom, string pathTo, ProcessMethod processMethod)
+    protected override void ProcessFile(string pathFrom, string pathTo, Mode mode)
     {
         using var reader = new BinaryReader(new FileStream(pathFrom, FileMode.Open));
         using var writer = new BinaryWriter(new FileStream(pathTo, FileMode.Create));
 
-        Func<byte[], byte[]>? processBuf = processMethod switch
+        Func<byte[], byte[]>? processBuf = mode switch
         {
-            ProcessMethod.Encrypt => Encrypt,
-            ProcessMethod.Decrypt => Decrypt,
+            Mode.Encryption => Encrypt,
+            Mode.Decryption => Decrypt,
             _ => null
         };
         if (processBuf is null)
         {
-            throw new ArgumentException("Invalid proccess method", nameof(processMethod));
+            throw new ArgumentException("Invalid cipher mode", nameof(mode));
         }
 
         ProcessingFile(reader, writer, processBuf);

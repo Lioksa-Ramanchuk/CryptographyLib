@@ -3,29 +3,34 @@ using System.Text;
 
 public class Caesar(char[] alphabet, int offset) : StringCipher
 {
-    public char[] Alphabet { get; set; } = alphabet;
-    public int Offset { get; set; } = offset;
+    private Mode _mode = Mode.Encryption;
 
     public override string Encrypt(string text)
     {
         if (string.IsNullOrEmpty(text))
         {
-            return text;
+            return string.Empty;
+        }
+
+        var adjustedOffset = _mode == Mode.Encryption ? offset : -offset;
+        if (adjustedOffset < 0)
+        {
+            adjustedOffset = (adjustedOffset % alphabet.Length + alphabet.Length) % alphabet.Length;
         }
 
         StringBuilder encrypted = new();
 
         foreach (char letter in text)
         {
-            int index = Array.IndexOf(Alphabet, char.ToUpper(letter));
+            int index = Array.IndexOf(alphabet, char.ToUpper(letter));
             if (index == -1)
             {
                 encrypted.Append(letter);
             }
             else
             {
-                int encryptedIndex = (((index + Offset) % Alphabet.Length) + Alphabet.Length) % Alphabet.Length;
-                char encryptedUppercaseLetter = Alphabet[encryptedIndex];
+                int encryptedIndex = (index + adjustedOffset) % alphabet.Length;
+                char encryptedUppercaseLetter = alphabet[encryptedIndex];
                 encrypted.Append(char.IsUpper(letter) ? encryptedUppercaseLetter : char.ToLower(encryptedUppercaseLetter));
             }
         }
@@ -35,7 +40,10 @@ public class Caesar(char[] alphabet, int offset) : StringCipher
 
     public override string Decrypt(string encrypted)
     {
-        var codec = new Caesar(Alphabet, -Offset);
+        var codec = new Caesar(alphabet, offset)
+        {
+            _mode = Mode.Decryption
+        };
         return codec.Encrypt(encrypted);
     }
 }

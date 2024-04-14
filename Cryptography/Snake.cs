@@ -1,17 +1,9 @@
 ﻿namespace Cryptography;
 using System.Text;
 
-public class Snake(int columns) : StringCipher
+public class Snake(int nColumns) : StringCipher
 {
-    private Direction _writeDirection = Direction.Straight;
-
-    private enum Direction
-    {
-        Straight = 1,
-        Snake = -1,
-    }
-
-    public int NColumns { get; private set; } = columns;
+    private Mode _mode = Mode.Encryption;
 
     public override string Encrypt(string text)
     {
@@ -21,14 +13,14 @@ public class Snake(int columns) : StringCipher
         }
 
         StringBuilder encrypted = new();
-        int nRows = (int)Math.Ceiling((decimal)text.Length / NColumns);
-        var table = new char?[nRows, NColumns];
+        int nRows = (text.Length + nColumns - 1) / nColumns;
+        var table = new char?[nRows, nColumns];
 
         void StraightTraversal(Action<int, int> action)
         {
             for (int iRow = 0; iRow < nRows; ++iRow)
             {
-                for (int iCol = 0; iCol < NColumns; ++iCol)
+                for (int iCol = 0; iCol < nColumns; ++iCol)
                 {
                     action(iRow, iCol);
                 }
@@ -37,10 +29,10 @@ public class Snake(int columns) : StringCipher
 
         void SnakeTraversal(Action<int, int> action)
         {
-            for (int layer = 0; layer < nRows + NColumns - 1; ++layer)
+            for (int layer = 0; layer < nRows + nColumns - 1; ++layer)
             {
                 int start_iCol = Math.Max(0, layer - nRows + 1);
-                int count = Math.Min(Math.Min(layer + 1, nRows), NColumns - start_iCol);
+                int count = Math.Min(Math.Min(layer + 1, nRows), nColumns - start_iCol);
 
                 for (int i = 0; i < count; ++i)
                 {
@@ -52,8 +44,8 @@ public class Snake(int columns) : StringCipher
                     }
                     else
                     {
-                        iRow = Math.Max(0, layer - NColumns + 1) + i;
-                        iCol = Math.Min(NColumns - 1, layer) - i;
+                        iRow = Math.Max(0, layer - nColumns + 1) + i;
+                        iCol = Math.Min(nColumns - 1, layer) - i;
                     }
 
                     action(iRow, iCol);
@@ -61,11 +53,11 @@ public class Snake(int columns) : StringCipher
             }
         }
 
-        if (_writeDirection == Direction.Straight)
+        if (_mode == Mode.Encryption)
         {
             StraightTraversal((int iRow, int iCol) =>
             {
-                int i = (iRow * NColumns) + iCol;
+                int i = iRow * nColumns + iCol;
                 table[iRow, iCol] = i < text.Length ? text[i] : null;
             });
             SnakeTraversal((int iRow, int iCol) =>
@@ -94,9 +86,9 @@ public class Snake(int columns) : StringCipher
     }
     public override string Decrypt(string encrypted)
     {
-        var codec = new Snake(NColumns)
+        var codec = new Snake(nColumns)
         {
-            _writeDirection = Direction.Snake,
+            _mode = Mode.Decryption,
         };
         return codec.Encrypt(encrypted);
     }

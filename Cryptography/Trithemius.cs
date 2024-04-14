@@ -3,7 +3,7 @@ using System.Text;
 
 public class Trithemius : StringCipher
 {
-    private Direction _encryptionDirection = Direction.Down;
+    private Mode _mode = Mode.Encryption;
 
     public Trithemius(char[] alphabet, int columns, string? key = null)
     {
@@ -21,12 +21,6 @@ public class Trithemius : StringCipher
         TableSize = ((Alphabet.Length + columns - 1) / columns, columns);
     }
 
-    private enum Direction
-    {
-        Down = 1,
-        Up = -1,
-    }
-
     public char[] Alphabet { get; private set; }
     public (int rows, int columns) TableSize { get; private set; }
 
@@ -39,6 +33,34 @@ public class Trithemius : StringCipher
 
         StringBuilder encrypted = new();
 
+        int GetEncryptedIndex(int index)
+        {
+            var encryptedIndex = index;
+            
+            if (_mode == Mode.Encryption)
+            {
+                encryptedIndex += TableSize.columns;
+                if (encryptedIndex >= Alphabet.Length)
+                {
+                    encryptedIndex %= TableSize.columns;
+                }
+            }
+            else
+            {
+                encryptedIndex -= TableSize.columns;
+                if (encryptedIndex < 0)
+                {
+                    encryptedIndex += TableSize.rows * TableSize.columns;
+                    if (encryptedIndex > Alphabet.Length)
+                    {
+                        encryptedIndex -= TableSize.columns;
+                    }
+                }
+            }
+
+            return encryptedIndex;
+        }
+
         foreach (char letter in text)
         {
             int index = Array.IndexOf(Alphabet, char.ToUpper(letter));
@@ -48,22 +70,7 @@ public class Trithemius : StringCipher
             }
             else
             {
-                int encryptedIndex = index + ((int)_encryptionDirection * TableSize.columns);
-
-                if (encryptedIndex >= Alphabet.Length)
-                {
-                    encryptedIndex %= TableSize.columns;
-                }
-                else if (encryptedIndex < 0)
-                {
-                    encryptedIndex += TableSize.rows * TableSize.columns;
-                    if (encryptedIndex > Alphabet.Length)
-                    {
-                        encryptedIndex -= TableSize.columns;
-                    }
-                }
-
-                char encryptedUppercaseLetter = Alphabet[encryptedIndex];
+                char encryptedUppercaseLetter = Alphabet[GetEncryptedIndex(index)];
                 encrypted.Append(char.IsUpper(letter) ? encryptedUppercaseLetter : char.ToLower(encryptedUppercaseLetter));
             }
         }
@@ -74,7 +81,7 @@ public class Trithemius : StringCipher
     {
         var codec = new Trithemius(Alphabet, TableSize.columns)
         {
-            _encryptionDirection = Direction.Up,
+            _mode = Mode.Decryption,
         };
         return codec.Encrypt(encrypted);
     }

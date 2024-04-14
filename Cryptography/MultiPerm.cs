@@ -3,28 +3,17 @@ using System.Text;
 
 public class MultiPerm : StringCipher
 {
-    private Direction _writeDirection = Direction.Straight;
     private string _key1 = null!;
     private string _key2 = null!;
     private int[] _key1Indices = null!;
     private int[] _key2Indices = null!;
+    private Mode _mode = Mode.Encryption;
 
     public MultiPerm(string key1, string key2, char[] alphabet)
     {
-        if (string.IsNullOrEmpty(key1) || string.IsNullOrEmpty(key2))
-        {
-            throw new ArgumentException("Invalid keys");
-        }
-
         Key1 = key1;
         Key2 = key2;
         Alphabet = alphabet;
-    }
-
-    private enum Direction
-    {
-        Straight = 1,
-        Permuted = -1,
     }
 
     public string Key1
@@ -32,6 +21,10 @@ public class MultiPerm : StringCipher
         get => _key1;
         set
         {
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentException("Invalid key", nameof(Key1));
+            }
             _key1Indices = GetLettersOrder(value);
             _key1 = value;
         }
@@ -41,6 +34,10 @@ public class MultiPerm : StringCipher
         get => _key2;
         set
         {
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentException("Invalid key", nameof(Key2));
+            }
             _key2Indices = GetLettersOrder(value);
             _key2 = value;
         }
@@ -49,9 +46,9 @@ public class MultiPerm : StringCipher
 
     public override string Encrypt(string text)
     {
-        if (string.IsNullOrWhiteSpace(text))
+        if (string.IsNullOrEmpty(text))
         {
-            return text;
+            return string.Empty;
         }
 
         if (text.Length > _key1Indices.Length * _key2Indices.Length)
@@ -76,11 +73,11 @@ public class MultiPerm : StringCipher
             }
         }
 
-        if (_writeDirection == Direction.Straight)
+        if (_mode == Mode.Encryption)
         {
             StraightTraversal((int iRow, int iCol) =>
             {
-                int i = (iRow * nColumns) + iCol;
+                int i = iRow * nColumns + iCol;
                 table[_key2Indices[iRow], _key1Indices[iCol]] = i < text.Length ? text[i] : null;
             });
             StraightTraversal((int iRow, int iCol) =>
@@ -92,7 +89,7 @@ public class MultiPerm : StringCipher
         {
             StraightTraversal((int iRow, int iCol) =>
             {
-                int i = (_key2Indices[iRow] * nColumns) + _key1Indices[iCol];
+                int i = _key2Indices[iRow] * nColumns + _key1Indices[iCol];
                 if (i < text.Length && text[i] != '\0')
                 {
                     encrypted.Append(text[i]);
@@ -106,7 +103,7 @@ public class MultiPerm : StringCipher
     {
         var codec = new MultiPerm(_key1, _key2, Alphabet)
         {
-            _writeDirection = Direction.Permuted,
+            _mode = Mode.Decryption,
         };
         return codec.Encrypt(encrypted);
     }

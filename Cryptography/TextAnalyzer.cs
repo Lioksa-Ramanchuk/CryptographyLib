@@ -263,7 +263,7 @@ public class TextAnalyzer
         }
         else
         {
-            informationLoss = (-p * Math.Log2(p)) - (q * Math.Log2(q));
+            informationLoss = -p * Math.Log2(p) - q * Math.Log2(q);
         }
 
         InformationQuantity = (double)(ShannonEntropy! * (1 - informationLoss) * SymbolsCount!);

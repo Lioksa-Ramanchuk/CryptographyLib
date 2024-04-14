@@ -139,14 +139,13 @@ public class Des : BlockCipher
     };
 
     private byte[] _key = null!;
+    private Mode _mode = Mode.Encryption;
 
-    public Des(byte[] key, Encoding? encoding = null)
+    public Des(byte[] key)
     {
-        Encoding = encoding ?? Encoding.UTF8;
         Key = key;
     }
 
-    public Encoding Encoding { get; }
     public byte[] Key 
     {
         get => _key; 
@@ -169,6 +168,10 @@ public class Des : BlockCipher
             key = ShiftKey(key, Shifts[iRound]);
             subkeys[iRound] = key.ApplyTable(PC2);
         }
+        if (_mode == Mode.Decryption)
+        {
+            Array.Reverse(subkeys);
+        }
 
         for (int iBlock = 0; iBlock < blocks.Length; ++iBlock)
         {
@@ -189,33 +192,11 @@ public class Des : BlockCipher
     }
     public override byte[] Decrypt(byte[] encrypted)
     {
-        var blocks = SplitIntoBlocks(encrypted);
-
-        var key = SplitIntoBlocks(Key).Single();
-        key = key.ApplyTable(PC1);
-        var subkeys = new BitArray[_kRoundsNumber];
-        for (int iRound = 0; iRound < _kRoundsNumber; ++iRound)
+        var codec = new Des(_key)
         {
-            key = ShiftKey(key, Shifts[iRound]);
-            subkeys[iRound] = key.ApplyTable(PC2);
-        }
-
-        for (int iBlock = 0; iBlock < blocks.Length; ++iBlock)
-        {
-            var block = blocks[iBlock].ApplyTable(IP);
-
-            var left = block.GetRange(..(block.Count / 2));
-            var right = block.GetRange((block.Count / 2)..);
-
-            for (int iRound = _kRoundsNumber - 1; iRound >= 0; --iRound)
-            {
-                (left, right) = (right, left.Xor(F(right, subkeys[iRound])));
-            }
-
-            blocks[iBlock] = new BitArray(right.Concat(left)).ApplyTable(IP2);
-        }
-
-        return blocks.SelectMany(block => block.GetBytes()).ToArray();
+            _mode = Mode.Decryption,
+        };
+        return codec.Encrypt(encrypted);
     }
 
     protected override void ProcessingFile(BinaryReader reader, BinaryWriter writer, Func<byte[], byte[]> processBuf)

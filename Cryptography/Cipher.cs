@@ -2,10 +2,10 @@
 
 public abstract class Cipher<T> : ICodec<T>, IFileCodec
 {
-    protected enum ProcessMethod
+    protected enum Mode
     {
-        Encrypt = 1,
-        Decrypt = -1,
+        Encryption,
+        Decryption,
     }
 
     public abstract T Encrypt(T text);
@@ -14,15 +14,15 @@ public abstract class Cipher<T> : ICodec<T>, IFileCodec
     public void EncryptFile(string pathText, string pathEncrypted)
     {
         using var tempSrcCopy = new TempFileCopy(pathText);
-        ProcessFile(tempSrcCopy.Name, pathEncrypted, ProcessMethod.Encrypt);
+        ProcessFile(tempSrcCopy.Name, pathEncrypted, Mode.Encryption);
     }
     public void DecryptFile(string pathEncrypted, string pathText)
     {
         using var tempSrcCopy = new TempFileCopy(pathEncrypted);
-        ProcessFile(tempSrcCopy.Name, pathText, ProcessMethod.Decrypt);
+        ProcessFile(tempSrcCopy.Name, pathText, Mode.Decryption);
     }
 
-    protected abstract void ProcessFile(string pathFrom, string pathTo, ProcessMethod processMethod);
+    protected abstract void ProcessFile(string pathFrom, string pathTo, Mode mode);
 
     private class TempFileCopy : IDisposable
     {
@@ -36,7 +36,6 @@ public abstract class Cipher<T> : ICodec<T>, IFileCodec
         }
 
         public string Source { get; private set; }
-
         public string Name { get; private set; }
 
         public void Dispose()
@@ -44,7 +43,6 @@ public abstract class Cipher<T> : ICodec<T>, IFileCodec
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposedValue)

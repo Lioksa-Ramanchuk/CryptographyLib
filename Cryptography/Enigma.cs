@@ -35,6 +35,11 @@ public class Enigma : StringCipher
 
     public override string Encrypt(string text)
     {
+        if (string.IsNullOrEmpty(text))
+        {
+            return string.Empty;
+        }
+
         var sb = new StringBuilder(text.Length);
         foreach (var c in text)
         {
@@ -75,7 +80,7 @@ public class Enigma : StringCipher
 
     public class EnigmaPlugboard
     {
-        private Dictionary<char, char> mapping = null!;
+        private Dictionary<char, char> _mapping = null!;
 
         public EnigmaPlugboard(Dictionary<char, char> mapping)
         {
@@ -84,12 +89,12 @@ public class Enigma : StringCipher
 
         public Dictionary<char, char> Mapping
         {
-            get => mapping;
+            get => _mapping;
             set
             {
                 AdjustPlugboardMapping(value);
                 ValidatePlugboardMapping(value);
-                mapping = value;
+                _mapping = value;
             }
         }
 
@@ -108,7 +113,6 @@ public class Enigma : StringCipher
                 }
             }
         }
-
         public static void ValidatePlugboardMapping(Dictionary<char, char> mapping)
         {
             var keys = new HashSet<char>(mapping.Keys);
@@ -127,8 +131,8 @@ public class Enigma : StringCipher
     }
     public class EnigmaRotor
     {
-        private string mapping = null!;
-        private int position;
+        private string _mapping = null!;
+        private int _position;
 
         public EnigmaRotor(string mapping, char[] notches, char position = 'A', int? step = null)
         {
@@ -137,56 +141,42 @@ public class Enigma : StringCipher
             Step = step;
             Notches = notches.Select(c => c - 'A').ToArray();
         }
-
         public EnigmaRotor(EnigmaRotor rotor)
         {
-            mapping = rotor.mapping;
-            position = rotor.position;
+            _mapping = rotor._mapping;
+            _position = rotor._position;
             Step = rotor.Step;
             Notches = (int[])rotor.Notches.Clone();
         }
 
         public static EnigmaRotor RotorI => new("EKMFLGDQVZNTOWYHXUSPAIBRCJ", ['Q']);
-
         public static EnigmaRotor RotorII => new("AJDKSIRUXBLHWTMCQGZNPYFVOE", ['E']);
-
         public static EnigmaRotor RotorIII => new("BDFHJLCPRTXVZNYEIWGAKMUSQO", ['V']);
-
         public static EnigmaRotor RotorIV => new("ESOVPZJAYQUIRHXLNFTGKDCMWB", ['J']);
-
         public static EnigmaRotor RotorV => new("VZBRGITYUPSDNHLXAWMJQOFECK", ['Z']);
-
         public static EnigmaRotor RotorVI => new("JPGVOUMFYQBENHZRDKASXLICTW", ['M', 'Z']);
-
         public static EnigmaRotor RotorVII => new("NZJHGRCXMYSWBOUFAIVLPEKQDT", ['M', 'Z']);
-
         public static EnigmaRotor RotorVIII => new("FKQHTLXOCBJSPDZRAMEWNIUYGV", ['M', 'Z']);
-
         public static EnigmaRotor RotorBeta => new("LEYJVCNIXWPBQMDRTAKZFGUHOS", []);
-
         public static EnigmaRotor RotorGamma => new("FSOKANUERHMBTIYCWLQPZXVGJD", []);
 
         public string Mapping
         {
-            get => mapping; set
+            get => _mapping; 
+            set
             {
                 ValidateRotorMapping(value);
-                mapping = value;
+                _mapping = value;
             }
         }
-
         public int Position
         {
-            get => position; 
-            set => position = ((value % AlphabetLength) + AlphabetLength) % AlphabetLength;
+            get => _position; 
+            set => _position = (value % AlphabetLength + AlphabetLength) % AlphabetLength;
         }
-
         public int? Step { get; }
-
         public int[] Notches { get; }
-
         public bool IsAtNotch => Notches.Contains(Position);
-
         public Action? OnNotch { get; set; }
 
         public static void ValidateRotorMapping(string mapping)
@@ -223,40 +213,26 @@ public class Enigma : StringCipher
     }
     public class EnigmaReflector
     {
-        private Dictionary<char, char> mapping = null!;
+        private Dictionary<char, char> _mapping = null!;
 
         public EnigmaReflector(Dictionary<char, char> mapping)
         {
             Mapping = mapping;
         }
 
-        public static EnigmaReflector ReflectorB => new(new Dictionary<char, char>
-        {
-            { 'A', 'Y' }, { 'B', 'R' }, { 'C', 'U' }, { 'D', 'H' }, { 'E', 'Q' }, { 'F', 'S' }, { 'G', 'L' }, { 'I', 'P' }, { 'J', 'X' }, { 'K', 'N' }, { 'M', 'O' }, { 'T', 'Z' }, { 'V', 'W' },
-        });
-
-        public static EnigmaReflector ReflectorC => new(new Dictionary<char, char>
-        {
-            { 'A', 'F' }, { 'B', 'V' }, { 'C', 'P' }, { 'D', 'J' }, { 'E', 'I' }, { 'G', 'O' }, { 'H', 'Y' }, { 'K', 'R' }, { 'L', 'Z' }, { 'M', 'X' }, { 'N', 'W' }, { 'T', 'Q' }, { 'S', 'U' },
-        });
-
-        public static EnigmaReflector ReflectorBDunn => new(new Dictionary<char, char>
-        {
-            { 'A', 'E' }, { 'B', 'N' }, { 'C', 'K' }, { 'D', 'Q' }, { 'F', 'U' }, { 'G', 'Y' }, { 'H', 'W' }, { 'I', 'J' }, { 'L', 'O' }, { 'M', 'P' }, { 'R', 'X' }, { 'S', 'Z' }, { 'T', 'V' },
-        });
-
-        public static EnigmaReflector ReflectorCDunn => new(new Dictionary<char, char>
-        {
-            { 'A', 'R' }, { 'B', 'D' }, { 'C', 'O' }, { 'E', 'J' }, { 'F', 'N' }, { 'G', 'T' }, { 'H', 'K' }, { 'I', 'V' }, { 'L', 'M' }, { 'P', 'W' }, { 'Q', 'Z' }, { 'S', 'X' }, { 'U', 'Y' },
-        });
+        public static EnigmaReflector ReflectorB => new(new Dictionary<char, char> { { 'A', 'Y' }, { 'B', 'R' }, { 'C', 'U' }, { 'D', 'H' }, { 'E', 'Q' }, { 'F', 'S' }, { 'G', 'L' }, { 'I', 'P' }, { 'J', 'X' }, { 'K', 'N' }, { 'M', 'O' }, { 'T', 'Z' }, { 'V', 'W' }, });
+        public static EnigmaReflector ReflectorC => new(new Dictionary<char, char> { { 'A', 'F' }, { 'B', 'V' }, { 'C', 'P' }, { 'D', 'J' }, { 'E', 'I' }, { 'G', 'O' }, { 'H', 'Y' }, { 'K', 'R' }, { 'L', 'Z' }, { 'M', 'X' }, { 'N', 'W' }, { 'T', 'Q' }, { 'S', 'U' }, });
+        public static EnigmaReflector ReflectorBDunn => new(new Dictionary<char, char> { { 'A', 'E' }, { 'B', 'N' }, { 'C', 'K' }, { 'D', 'Q' }, { 'F', 'U' }, { 'G', 'Y' }, { 'H', 'W' }, { 'I', 'J' }, { 'L', 'O' }, { 'M', 'P' }, { 'R', 'X' }, { 'S', 'Z' }, { 'T', 'V' }, });
+        public static EnigmaReflector ReflectorCDunn => new(new Dictionary<char, char> { { 'A', 'R' }, { 'B', 'D' }, { 'C', 'O' }, { 'E', 'J' }, { 'F', 'N' }, { 'G', 'T' }, { 'H', 'K' }, { 'I', 'V' }, { 'L', 'M' }, { 'P', 'W' }, { 'Q', 'Z' }, { 'S', 'X' }, { 'U', 'Y' }, });
 
         public Dictionary<char, char> Mapping
         {
-            get => mapping; set
+            get => _mapping; 
+            set
             {
                 AdjustReflectorMapping(value);
                 ValidateReflectorMapping(value);
-                mapping = value;
+                _mapping = value;
             }
         }
 
@@ -271,7 +247,6 @@ public class Enigma : StringCipher
                 }
             }
         }
-
         public static void ValidateReflectorMapping(Dictionary<char, char> mapping)
         {
             var values = new HashSet<char>(mapping.Values);

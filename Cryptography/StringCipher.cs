@@ -2,22 +2,22 @@
 
 public abstract class StringCipher : Cipher<string>
 {
-    protected override void ProcessFile(string pathFrom, string pathTo, ProcessMethod processMethod)
+    protected override void ProcessFile(string pathFrom, string pathTo, Mode mode)
     {
         File.Create(pathTo).Dispose();
 
         using var reader = new StreamReader(pathFrom);
         using var writer = new StreamWriter(pathTo);
 
-        Func<string, string>? processLine = processMethod switch
+        Func<string, string>? processLine = mode switch
         {
-            ProcessMethod.Encrypt => Encrypt,
-            ProcessMethod.Decrypt => Decrypt,
+            Mode.Encryption => Encrypt,
+            Mode.Decryption => Decrypt,
             _ => null
         };
         if (processLine is null)
         {
-            throw new ArgumentException("Invalid proccess method", nameof(processMethod));
+            throw new ArgumentException("Invalid cipher mode", nameof(mode));
         }
 
         ProcessingFile(reader, writer, processLine);
