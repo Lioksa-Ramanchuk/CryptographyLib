@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SonarQube.Scanner.DotNetCore.Tool" Version="4.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\Lioksa\c_sharp\Cryptography\Cryptography\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\Lioksa\c_sharp\Cryptography\Cryptography\.editorconfig" />
+  </ItemGroup>
+
+</Project>
