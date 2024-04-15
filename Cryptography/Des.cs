@@ -210,6 +210,16 @@ public class Des : BlockCipher
         }
     }
 
+    public double CalculateAvalanche(byte[] text1, byte[] text2)
+    {
+        var encrypted1 = Encrypt(text1);
+        var encrypted2 = Encrypt(text2);
+
+        int differingBits = new BitArray(encrypted1).Xor(new BitArray(encrypted2)).CountOnes();
+
+        double totalBits = encrypted1.Length * 8;
+        return 100.0 * differingBits / totalBits;
+    }
     private static void ValidateKey(byte[] key)
     {
         if (key.Length != _kBlockSize)
@@ -369,5 +379,9 @@ internal class BitArray : List<bool>
     public BitArray ApplyTable(int[] table, int offset = -1)
     {
         return new(table.Select(i => this[i + offset]));
+    }
+    public int CountOnes()
+    {
+        return this.Count(b => b); 
     }
 }
