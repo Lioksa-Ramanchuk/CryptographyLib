@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 
-public class RsaGenerator(BigInteger p, BigInteger q, BigInteger e, BigInteger x0)
+public class RSAGenerator(BigInteger p, BigInteger q, BigInteger e, BigInteger x0)
     : IEnumerable<BigInteger>
 {
     public BigInteger Q { get; } = q;

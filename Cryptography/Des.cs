@@ -1,10 +1,7 @@
 ﻿namespace Cryptography;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using Utils;
 
-public class Des : BlockCipher
+public class DES : BlockCipher
 {
     private const int _kBlockSize = 8;
     private const int _kRoundsNumber = 16;
@@ -140,7 +137,7 @@ public class Des : BlockCipher
     private byte[] _key = null!;
     private Mode _mode = Mode.Encryption;
 
-    public Des(byte[] key)
+    public DES(byte[] key)
     {
         Key = key;
     }
@@ -191,7 +188,7 @@ public class Des : BlockCipher
     }
     public override byte[] Decrypt(byte[] encrypted)
     {
-        var codec = new Des(_key)
+        var codec = new DES(_key)
         {
             _mode = Mode.Decryption,
         };
@@ -279,108 +276,5 @@ public class Des : BlockCipher
             }
         }
         return result;
-    }
-}
-
-internal static class Extensions
-{
-    public static IEnumerable<T?> TakeOrDefault<T>(this IEnumerable<T> items, int count)
-    {
-        var i = 0;
-        foreach (var item in items)
-        {
-            yield return item;
-            if (++i == count)
-            {
-                yield break;
-            }
-        }
-        while (i++ < count)
-        {
-            yield return default;
-        }
-    }
-}
-
-internal class BitArray : List<bool>
-{
-    public BitArray(BitArray ba) : base(ba) { }
-    public BitArray(int capacity)
-    {
-        AddRange(new bool[capacity]);
-    }
-    public BitArray(IEnumerable<bool> bits) : base(bits) { }
-    public BitArray(byte[] bytes)
-    {
-        var bits = new bool[bytes.Length * 8];
-        for (int iByte = 0; iByte < bytes.Length; ++iByte)
-        {
-            byte b = bytes[iByte];
-            for (int i = 0; i < 8; ++i)
-            {
-                bits[iByte * 8 + 7 - i] = (b & (1 << i)) != 0;
-            }
-        }
-        AddRange(bits);
-    }
-
-    public static byte ConvertToByte(IEnumerable<bool> bits)
-    {
-        byte result = 0;
-        for (int i = 0; i < 8; ++i)
-        {
-            if (bits.ElementAt(^(i + 1)))
-            {
-                result |= (byte)(1 << i);
-            }
-        }
-        return result;
-    }
-
-    public BitArray Xor(BitArray ba)
-    {
-        if (Count != ba.Count)
-        {
-            throw new InvalidOperationException();
-        }
-        return new(this.Select((bit, i) => bit ^ ba[i]));
-    }
-    public BitArray LeftShift(int count)
-    {
-        var result = new BitArray(Count);
-
-        for (int i = Count - 1; i >= count; --i)
-        {
-            result[i - count] = this[i];
-        }
-        for (int i = 0; i < count; ++i)
-        {
-            result[^(i + 1)] = this[count - 1 - i];
-        }
-
-        return result;
-    }
-    public byte[] GetBytes()
-    {
-        if (Count % 8 != 0)
-        {
-            throw new InvalidOperationException();
-        }
-
-        return Enumerable.Range(0, Count / 8)
-            .Select(iByte => ConvertToByte(this.Skip(iByte * 8).Take(8)))
-            .ToArray();
-    }
-    public BitArray GetRange(Range range)
-    {
-        return new(ToArray()[range]);
-    }
-    public BitArray ApplyTable(int[] table, int offset = -1)
-    {
-        return new(table.Select(i => this[i + offset]));
-    }
-    public int CountOnes()
-    {
-        return this.Count(b => b);
     }
 }
