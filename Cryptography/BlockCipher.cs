@@ -15,7 +15,7 @@ public abstract class BlockCipher : Cipher<byte[]>
         };
         if (processBuf is null)
         {
-            throw new ArgumentException("Invalid cipher mode", nameof(mode));
+            throw new ArgumentException("Invalid cipher mode.", nameof(mode));
         }
 
         ProcessingFile(reader, writer, processBuf);

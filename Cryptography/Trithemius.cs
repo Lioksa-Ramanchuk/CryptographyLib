@@ -36,7 +36,7 @@ public class Trithemius : StringCipher
         int GetEncryptedIndex(int index)
         {
             var encryptedIndex = index;
-            
+
             if (_mode == Mode.Encryption)
             {
                 encryptedIndex += TableSize.columns;

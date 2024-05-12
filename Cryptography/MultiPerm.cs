@@ -23,7 +23,7 @@ public class MultiPerm : StringCipher
         {
             if (string.IsNullOrEmpty(value))
             {
-                throw new ArgumentException("Invalid key", nameof(Key1));
+                throw new ArgumentException("Invalid key.", nameof(Key1));
             }
             _key1Indices = GetLettersOrder(value);
             _key1 = value;
@@ -36,7 +36,7 @@ public class MultiPerm : StringCipher
         {
             if (string.IsNullOrEmpty(value))
             {
-                throw new ArgumentException("Invalid key", nameof(Key2));
+                throw new ArgumentException("Invalid key.", nameof(Key2));
             }
             _key2Indices = GetLettersOrder(value);
             _key2 = value;
@@ -53,7 +53,7 @@ public class MultiPerm : StringCipher
 
         if (text.Length > _key1Indices.Length * _key2Indices.Length)
         {
-            throw new ArgumentException("Text is too long for the keys", nameof(text));
+            throw new ArgumentException("Text is too long for the keys.", nameof(text));
         }
 
         StringBuilder encrypted = new();

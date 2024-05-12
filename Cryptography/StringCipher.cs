@@ -17,7 +17,7 @@ public abstract class StringCipher : Cipher<string>
         };
         if (processLine is null)
         {
-            throw new ArgumentException("Invalid cipher mode", nameof(mode));
+            throw new ArgumentException("Invalid cipher mode.", nameof(mode));
         }
 
         ProcessingFile(reader, writer, processLine);

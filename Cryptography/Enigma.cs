@@ -120,13 +120,13 @@ public class Enigma : StringCipher
 
             if (!keys.SetEquals(values) || keys.Any(k => k != mapping[mapping[k]]))
             {
-                throw new ArgumentException("Invalid mapping", nameof(mapping));
+                throw new ArgumentException("Invalid mapping.", nameof(mapping));
             }
         }
 
         public char SwapIfPlugged(char c)
         {
-            return Mapping.ContainsKey(c) ? Mapping[c] : c;
+            return Mapping.TryGetValue(c, out char value) ? value : c;
         }
     }
     public class EnigmaRotor
@@ -162,7 +162,7 @@ public class Enigma : StringCipher
 
         public string Mapping
         {
-            get => _mapping; 
+            get => _mapping;
             set
             {
                 ValidateRotorMapping(value);
@@ -171,7 +171,7 @@ public class Enigma : StringCipher
         }
         public int Position
         {
-            get => _position; 
+            get => _position;
             set => _position = (value % AlphabetLength + AlphabetLength) % AlphabetLength;
         }
         public int? Step { get; }
@@ -183,7 +183,7 @@ public class Enigma : StringCipher
         {
             if (mapping?.Length != AlphabetLength || !Alphabet.ToHashSet().SetEquals(mapping.ToHashSet()))
             {
-                throw new ArgumentException("Invalid mapping", nameof(mapping));
+                throw new ArgumentException("Invalid mapping.", nameof(mapping));
             }
         }
 
@@ -227,7 +227,7 @@ public class Enigma : StringCipher
 
         public Dictionary<char, char> Mapping
         {
-            get => _mapping; 
+            get => _mapping;
             set
             {
                 AdjustReflectorMapping(value);
@@ -256,7 +256,7 @@ public class Enigma : StringCipher
                     || mapping[c] == c
                     || !values.Contains(c)))
             {
-                throw new ArgumentException("Invalid mapping", nameof(mapping));
+                throw new ArgumentException("Invalid mapping.", nameof(mapping));
             }
         }
 

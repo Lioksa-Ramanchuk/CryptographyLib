@@ -67,10 +67,10 @@ public class TextAnalyzer
     {
         if (Text is null && TextPath is null)
         {
-            throw new InvalidOperationException("Text is not set");
+            throw new InvalidOperationException("Text is not set.");
         }
 
-        SymbolsOccurences = new();
+        SymbolsOccurences = [];
 
         if (Alphabet is null)
         {
@@ -178,7 +178,7 @@ public class TextAnalyzer
             CalcSymbolsCount();
         }
 
-        SymbolsProbabilities = new();
+        SymbolsProbabilities = [];
         foreach (var (c, count) in SymbolsOccurences!)
         {
             SymbolsProbabilities.Add(c, (double)((double)count / SymbolsCount!));
