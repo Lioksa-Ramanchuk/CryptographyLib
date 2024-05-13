@@ -35,6 +35,19 @@ public class BitArray : List<bool>
         return result;
     }
 
+    public static int ConvertBitsToInt(params bool[] ba)
+    {
+        int result = 0;
+        for (int i = 0; i < ba.Length; i++)
+        {
+            if (ba[^(i + 1)])
+            {
+                result |= 1 << i;
+            }
+        }
+        return result;
+    }
+
     public BitArray Xor(BitArray ba)
     {
         if (Count != ba.Count)

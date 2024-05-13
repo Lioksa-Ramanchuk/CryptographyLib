@@ -1,6 +1,6 @@
 ﻿namespace Cryptography;
 
-public abstract class Cipher<T> : ICodec<T>, IFileCodec
+public abstract class Cipher<T1, T2> : ICodec<T1, T2>, IFileCodec
 {
     protected enum Mode
     {
@@ -8,8 +8,8 @@ public abstract class Cipher<T> : ICodec<T>, IFileCodec
         Decryption,
     }
 
-    public abstract T Encrypt(T text);
-    public abstract T Decrypt(T encrypted);
+    public abstract T2 Encrypt(T1 text);
+    public abstract T1 Decrypt(T2 encrypted);
 
     public void EncryptFile(string pathText, string pathEncrypted)
     {

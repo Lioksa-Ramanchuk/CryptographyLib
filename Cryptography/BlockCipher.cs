@@ -1,6 +1,6 @@
 ﻿namespace Cryptography;
 
-public abstract class BlockCipher : Cipher<byte[]>
+public abstract class BlockCipher : Cipher<byte[], byte[]>
 {
     protected override void ProcessFile(string pathFrom, string pathTo, Mode mode)
     {

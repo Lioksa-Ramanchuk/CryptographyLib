@@ -1,7 +1,7 @@
 ﻿namespace Cryptography;
 
-public interface ICodec<T>
+public interface ICodec<T1, T2>
 {
-    T Encrypt(T text);
-    T Decrypt(T encrypted);
+    T2 Encrypt(T1 text);
+    T1 Decrypt(T2 encrypted);
 }

@@ -253,8 +253,8 @@ public class DES : BlockCipher
         {
             var groupStart = iGroup * kGroupBitsSize;
             var groupEnd = groupStart + kGroupBitsSize;
-            var row = ConvertBitsToInt(right[groupStart], right[groupEnd - 1]);
-            var col = ConvertBitsToInt(right.ToArray()[(groupStart + 1)..(groupEnd - 1)]);
+            var row = BitArray.ConvertBitsToInt(right[groupStart], right[groupEnd - 1]);
+            var col = BitArray.ConvertBitsToInt(right.ToArray()[(groupStart + 1)..(groupEnd - 1)]);
 
             var value = S_boxes[iGroup][row, col];
             for (int i = 0; i < kGroupWrittenBitsSize; ++i)
@@ -264,17 +264,5 @@ public class DES : BlockCipher
         }
 
         return result.ApplyTable(P);
-    }
-    private static int ConvertBitsToInt(params bool[] ba)
-    {
-        int result = 0;
-        for (int i = 0; i < ba.Length; i++)
-        {
-            if (ba[^(i + 1)])
-            {
-                result |= 1 << i;
-            }
-        }
-        return result;
     }
 }

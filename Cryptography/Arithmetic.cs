@@ -6,11 +6,11 @@ public static class Arithmetic
 {
     public static int GCD(int a, params int[] nums)
     {
-        int result = a;
+        var result = a;
         for (int i = 0; i < nums.Length; ++i)
         {
             a = result;
-            int b = nums[i];
+            var b = nums[i];
             while (a != 0 && b != 0)
             {
                 if (a > b)
@@ -26,6 +26,48 @@ public static class Arithmetic
         }
 
         return result;
+    }
+
+    public static (int gcd, int x, int y) ExtendedGCD(int a, int b)
+    {
+        int x = 0, y = 1;   // b = a*x + b*y
+        int u = 1, v = 0;   // a = a*u + b*v
+
+        while (a != 0)
+        {
+            // b = a*q + r
+            var (q, r) = (b / a, b % a);
+
+            // a*x + b*y = b
+            // a*u + b*v = a  | * -q
+            // a * (x - u*q) + b * (y - v*q) = r
+            var (m, n) = (x - u * q, y - v * q);
+            (b, a) = (a, r);
+            (x, y) = (u, v);
+            (u, v) = (m, n);
+        }
+        return (b, x, y);
+    }
+
+    public static (BigInteger gcd, BigInteger x, BigInteger y) ExtendedGCD(BigInteger a, BigInteger b)
+    {
+        BigInteger x = 0, y = 1;
+        BigInteger u = 1, v = 0;
+
+        while (a != 0)
+        {
+            var (q, r) = (b / a, b % a);
+            var (m, n) = (x - u * q, y - v * q);
+            (b, a) = (a, r);
+            (x, y) = (u, v);
+            (u, v) = (m, n);
+        }
+        return (b, x, y);
+    }
+
+    public static BigInteger ModInverse(BigInteger a, BigInteger n)
+    {
+        return (ExtendedGCD(a, n).x % n + n) % n;
     }
 
     public static bool IsPrime(int num)
@@ -105,5 +147,39 @@ public static class Arithmetic
         }
 
         return divisors;
+    }
+
+    public static BigInteger[] GenerateSuperincreasingSequence(int n, int minBits = 100)
+    {
+        Random rand = new();
+        var seq = new BigInteger[n];
+        BigInteger sum = 0;
+        byte[] randomBytes;
+        var delta = (double)minBits / n;
+        for (int i = 0; i < n; ++i)
+        {
+            randomBytes = new byte[(int)Math.Ceiling(delta * (i + 1) / 8)];
+            rand.NextBytes(randomBytes);
+            seq[i] = sum + 1 + BigInteger.Abs(new BigInteger(randomBytes));
+            sum += seq[i];
+        }
+        if (seq[n - 1].GetBitLength() < minBits)
+        {
+            seq[n - 1] += BigInteger.Pow(2, minBits - 1);
+        }
+        return seq;
+    }
+
+    public static BigInteger[] GenerateNormalSequence(BigInteger[] superincreasingSequence, BigInteger a, BigInteger n)
+    {
+        if (n <= superincreasingSequence.Aggregate((a, b) => a + b))
+        {
+            throw new ArgumentException("n needs to be greater than superincreasing sequence elements sum.", nameof(n));
+        }
+        if (BigInteger.GreatestCommonDivisor(a, n) != 1)
+        {
+            throw new ArgumentException("a needs to be coprime with n.", nameof(a));
+        }
+        return superincreasingSequence.Select(d => d * a % n).ToArray();
     }
 }

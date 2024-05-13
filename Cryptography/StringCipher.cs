@@ -1,6 +1,6 @@
 ﻿namespace Cryptography;
 
-public abstract class StringCipher : Cipher<string>
+public abstract class StringCipher : Cipher<string, string>
 {
     protected override void ProcessFile(string pathFrom, string pathTo, Mode mode)
     {
