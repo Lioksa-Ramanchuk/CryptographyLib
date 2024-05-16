@@ -1,7 +1,7 @@
 ﻿namespace Cryptography;
 using Utils;
 
-public class DES : BlockCipher
+public class DES : ByteCipher
 {
     private const int _kBlockSize = 8;
     private const int _kRoundsNumber = 16;
