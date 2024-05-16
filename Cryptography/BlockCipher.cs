@@ -21,12 +21,11 @@ public abstract class ByteCipher : Cipher<byte[], byte[]>
         ProcessingFile(reader, writer, processBuf);
     }
 
-    protected virtual void ProcessingFile(BinaryReader reader, BinaryWriter writer, Func<byte[], byte[]> processBuf)
+    protected virtual void ProcessingFile(BinaryReader reader, BinaryWriter writer, Func<byte[], byte[]> processBuf, int bufSize = 1024)
     {
-        const int kDefaultBufSize = 1024;
-        var buf = new byte[kDefaultBufSize];
+        var buf = new byte[bufSize];
         int bytesRead;
-        while ((bytesRead = reader.Read(buf, 0, kDefaultBufSize)) > 0)
+        while ((bytesRead = reader.Read(buf, 0, bufSize)) > 0)
         {
             writer.Write(processBuf(buf[..bytesRead]));
         }

@@ -195,12 +195,12 @@ public class DES : ByteCipher
         return codec.Encrypt(encrypted);
     }
 
-    protected override void ProcessingFile(BinaryReader reader, BinaryWriter writer, Func<byte[], byte[]> processBuf)
+    protected override void ProcessingFile(BinaryReader reader, BinaryWriter writer, Func<byte[], byte[]> processBuf, int bufSize)
     {
-        const int kBufSize = _kBlockSize * 128;
-        var buf = new byte[kBufSize];
+        bufSize = _kBlockSize * 128;
+        var buf = new byte[bufSize];
         int bytesRead;
-        while ((bytesRead = reader.Read(buf, 0, kBufSize)) > 0)
+        while ((bytesRead = reader.Read(buf, 0, bufSize)) > 0)
         {
             writer.Write(processBuf(buf[..bytesRead]));
         }

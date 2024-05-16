@@ -22,12 +22,11 @@ public abstract class AsymmetricCipher : Cipher<byte[], BigInteger[]>
         }
     }
 
-    protected virtual void EncryptingFile(BinaryReader reader, BinaryWriter writer, Func<byte[], BigInteger[]> encryptBuf)
+    protected virtual void EncryptingFile(BinaryReader reader, BinaryWriter writer, Func<byte[], BigInteger[]> encryptBuf, int bufSize = 1024)
     {
-        const int kDefaultBufSize = 1024;
-        var buf = new byte[kDefaultBufSize];
+        var buf = new byte[bufSize];
         int bytesRead;
-        while ((bytesRead = reader.Read(buf, 0, kDefaultBufSize)) > 0)
+        while ((bytesRead = reader.Read(buf, 0, bufSize)) > 0)
         {
             foreach (var item in encryptBuf(buf[..bytesRead]))
             {
