@@ -21,7 +21,7 @@ public class Elgamal(BigInteger p, BigInteger g, BigInteger x) : AsymmetricCiphe
         }
         foreach (var b in text)
         {
-            int k = rand.Next(1, kUpperBound);
+            int k = rand.Next(1, kUpperBound - 1);
             encoded.Add((
                     BigInteger.ModPow(G, k, P),
                     BigInteger.ModPow(Y, k, P) * (BigInteger)b
