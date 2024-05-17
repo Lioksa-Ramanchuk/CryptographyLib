@@ -1,8 +1,6 @@
-﻿using System.Numerics;
+﻿namespace Cryptography;
 
-namespace Cryptography;
-
-public abstract class AsymmetricCipher : Cipher<byte[], BigInteger[]>
+public abstract class AsymmetricCipher<T> : Cipher<byte[], T[]>
 {
     protected override void ProcessFile(string pathFrom, string pathTo, Mode mode)
     {
@@ -22,28 +20,7 @@ public abstract class AsymmetricCipher : Cipher<byte[], BigInteger[]>
         }
     }
 
-    protected virtual void EncryptingFile(BinaryReader reader, BinaryWriter writer, Func<byte[], BigInteger[]> encryptBuf, int bufSize = 1024)
-    {
-        var buf = new byte[bufSize];
-        int bytesRead;
-        while ((bytesRead = reader.Read(buf, 0, bufSize)) > 0)
-        {
-            foreach (var item in encryptBuf(buf[..bytesRead]))
-            {
-                writer.Write(item.GetByteCount());
-                writer.Write(item.ToByteArray());
-            }
-        }
-    }
+    protected abstract void EncryptingFile(BinaryReader reader, BinaryWriter writer, Func<byte[], T[]> encryptBuf, int bufSize = 1024);
 
-    protected virtual void DecryptingFile(BinaryReader reader, BinaryWriter writer, Func<BigInteger[], byte[]> decryptBigIntegers)
-    {
-        List<BigInteger> bis = [];
-        while (reader.BaseStream.Position != reader.BaseStream.Length)
-        {
-            var size = reader.ReadInt32();
-            bis.Add(new(reader.ReadBytes(size)));
-        }
-        writer.Write(decryptBigIntegers([.. bis]));
-    }
+    protected abstract void DecryptingFile(BinaryReader reader, BinaryWriter writer, Func<T[], byte[]> decryptBigIntegers);
 }

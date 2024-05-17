@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace Cryptography;
 
-public class Knapsack(BigInteger[] d, BigInteger a, BigInteger n) : AsymmetricCipher
+public class Knapsack(BigInteger[] d, BigInteger a, BigInteger n) : AsymmetricCipher<BigInteger>
 {
     public BigInteger A { get; } = a;
     public BigInteger InversedA { get; } = Arithmetic.ModInverse(a, n);
@@ -46,5 +46,39 @@ public class Knapsack(BigInteger[] d, BigInteger a, BigInteger n) : AsymmetricCi
             }
         }
         return decrypted;
+    }
+
+    protected override void EncryptingFile(BinaryReader reader, BinaryWriter writer, Func<byte[], BigInteger[]> encryptBuf, int bufSize = 1024)
+    {
+        var buf = new byte[bufSize];
+        int bytesRead;
+        while ((bytesRead = reader.Read(buf, 0, bufSize)) > 0)
+        {
+            foreach (var item in encryptBuf(buf[..bytesRead]))
+            {
+                writer.Write(item.GetByteCount());
+                writer.Write(item.ToByteArray());
+            }
+        }
+    }
+
+    protected override void DecryptingFile(BinaryReader reader, BinaryWriter writer, Func<BigInteger[], byte[]> decryptBigIntegers)
+    {
+        const int kMaxBlockSize = 1024;
+        int currentSize = 0;
+        List<BigInteger> bis = [];
+        while (reader.BaseStream.Position != reader.BaseStream.Length)
+        {
+            var size = reader.ReadInt32();
+            if (currentSize + size > kMaxBlockSize)
+            {
+                writer.Write(decryptBigIntegers([.. bis]));
+                bis = [];
+                currentSize = 0;
+            }
+            bis.Add(new(reader.ReadBytes(size)));
+            currentSize += size;
+        }
+        writer.Write(decryptBigIntegers([.. bis]));
     }
 }
