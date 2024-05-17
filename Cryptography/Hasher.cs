@@ -1,30 +1,16 @@
-﻿namespace Cryptography;
+namespace Cryptography;
 
-public abstract class Cipher<T1, T2> : ICodec<T1, T2>, IFileCodec
+public abstract class Hasher<T1, T2> : IHasher<T1, T2>, IFileHasher
 {
-    protected enum Mode
-    {
-        Encryption,
-        Decryption,
-    }
-
-    public abstract T2 Encrypt(T1 text);
-    public abstract T1 Decrypt(T2 encrypted);
-
-    public void EncryptFile(string pathText, string pathEncrypted)
+    public abstract T2 Hash(T1 text);
+    public void HashFile(string pathText, string pathHashed)
     {
         using var tempSrcCopy = new TempFileCopy(pathText);
-        File.Create(pathEncrypted).Dispose();
-        ProcessFile(tempSrcCopy.Name, pathEncrypted, Mode.Encryption);
-    }
-    public void DecryptFile(string pathEncrypted, string pathText)
-    {
-        using var tempSrcCopy = new TempFileCopy(pathEncrypted);
-        File.Create(pathText).Dispose();
-        ProcessFile(tempSrcCopy.Name, pathText, Mode.Decryption);
+        File.Create(pathHashed).Dispose();
+        ProcessFile(tempSrcCopy.Name, pathHashed);
     }
 
-    protected abstract void ProcessFile(string pathFrom, string pathTo, Mode mode);
+    protected abstract void ProcessFile(string pathFrom, string pathTo);
 
     private class TempFileCopy : IDisposable
     {

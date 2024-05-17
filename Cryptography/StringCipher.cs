@@ -4,8 +4,6 @@ public abstract class StringCipher : Cipher<string, string>
 {
     protected override void ProcessFile(string pathFrom, string pathTo, Mode mode)
     {
-        File.Create(pathTo).Dispose();
-
         using var reader = new StreamReader(pathFrom);
         using var writer = new StreamWriter(pathTo);
 
