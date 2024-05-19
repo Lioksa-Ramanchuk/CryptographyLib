@@ -2,29 +2,25 @@ using System.Numerics;
 
 namespace Cryptography;
 
-public class Elgamal(BigInteger p, BigInteger g, BigInteger x) : AsymmetricCipher<(BigInteger a, BigInteger b)>
+public class ElGamal(BigInteger p, BigInteger g, BigInteger x) : AsymmetricCipher<(BigInteger a, BigInteger b)>
 {
-    private readonly Random rand = new();
-
-    public BigInteger P { get; } = p;
-    public BigInteger G { get; } = g;
-    public BigInteger X { get; } = x;
-    public BigInteger Y { get; } = BigInteger.ModPow(g, x, p);
+    private readonly Random _rand = new();
+    private readonly BigInteger _y = BigInteger.ModPow(g, x, p);
 
     public override (BigInteger a, BigInteger b)[] Encrypt(byte[] text)
     {
         var encoded = new List<(BigInteger a, BigInteger b)>(text.Length);
 
-        if (!int.TryParse(P.ToString(), out int kUpperBound))
+        if (!int.TryParse(p.ToString(), out int kUpperBound))
         {
             kUpperBound = int.MaxValue;
         }
         foreach (var b in text)
         {
-            int k = rand.Next(1, kUpperBound - 1);
+            int k = _rand.Next(1, kUpperBound - 1);
             encoded.Add((
-                    BigInteger.ModPow(G, k, P),
-                    BigInteger.ModPow(Y, k, P) * (BigInteger)b
+                    BigInteger.ModPow(g, k, p),
+                    BigInteger.ModPow(_y, k, p) * (BigInteger)b
                 ));
         }
         return [.. encoded];
@@ -35,7 +31,7 @@ public class Elgamal(BigInteger p, BigInteger g, BigInteger x) : AsymmetricCiphe
         var decrypted = new List<byte>(encryptedText.Length);
         foreach (var (a, b) in encryptedText)
         {
-            decrypted.Add((byte)(b * BigInteger.ModPow(a, P - X - 1, P) % P));
+            decrypted.Add((byte)(b * BigInteger.ModPow(a, p - x - 1, p) % p));
         }
         return [.. decrypted];
     }

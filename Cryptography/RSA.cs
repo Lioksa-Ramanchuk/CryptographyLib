@@ -1,31 +1,31 @@
-using System.Security.Cryptography;
-
 namespace Cryptography;
+
+using SysCryptography = System.Security.Cryptography;
 
 public class RSA : ByteCipher
 {
     public RSA(int keySize = 2048)
     {
         KeySize = keySize;
-        using var rsa = new RSACryptoServiceProvider(keySize);
+        using var rsa = new SysCryptography.RSACryptoServiceProvider(keySize);
         PrivateKeyParameters = rsa.ExportParameters(true);
         PublicKeyParameters = rsa.ExportParameters(false);
     }
 
     public int KeySize { get; }
-    public RSAParameters PublicKeyParameters { get; }
-    public RSAParameters PrivateKeyParameters { get; }
+    public SysCryptography.RSAParameters PublicKeyParameters { get; }
+    public SysCryptography.RSAParameters PrivateKeyParameters { get; }
 
     public override byte[] Encrypt(byte[] text)
     {
-        using var rsa = new RSACryptoServiceProvider();
+        using var rsa = new SysCryptography.RSACryptoServiceProvider();
         rsa.ImportParameters(PublicKeyParameters);
         return rsa.Encrypt(text, false);
     }
 
     public override byte[] Decrypt(byte[] encrypted)
     {
-        using var rsa = new RSACryptoServiceProvider();
+        using var rsa = new SysCryptography.RSACryptoServiceProvider();
         rsa.ImportParameters(PrivateKeyParameters);
         return rsa.Decrypt(encrypted, false);
     }

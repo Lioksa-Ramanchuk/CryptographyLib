@@ -1,6 +1,7 @@
-﻿using System.Numerics;
+﻿namespace Cryptography;
 
-namespace Cryptography;
+using System.Numerics;
+using SysCryptography = System.Security.Cryptography;
 
 public static class Arithmetic
 {
@@ -160,7 +161,7 @@ public static class Arithmetic
         {
             randomBytes = new byte[(int)Math.Ceiling(delta * (i + 1) / 8)];
             rand.NextBytes(randomBytes);
-            seq[i] = sum + 1 + BigInteger.Abs(new BigInteger(randomBytes));
+            seq[i] = sum + 1 + new BigInteger(randomBytes, true);
             sum += seq[i];
         }
         if (seq[n - 1].GetBitLength() < minBits)
@@ -181,5 +182,41 @@ public static class Arithmetic
             throw new ArgumentException("a needs to be coprime with n.", nameof(a));
         }
         return superincreasingSequence.Select(d => d * a % n).ToArray();
+    }
+
+    public static BigInteger NextBigInteger(this Random rand, BigInteger lowerBound, BigInteger upperBound)
+    {
+        if (lowerBound >= upperBound)
+        {
+            throw new ArgumentException("Lower bound must be less than upper bound.");
+        }
+        BigInteger range = upperBound - lowerBound;
+        byte[] bytes = range.ToByteArray();
+        rand.NextBytes(bytes);
+        var randomBigInt = new BigInteger(bytes, true) % range;
+        return randomBigInt + lowerBound;
+    }
+
+    public static BigInteger GenerateCoprime(this Random rand, BigInteger p, BigInteger upperBound)
+    {
+        if (p <= 2)
+        {
+            throw new ArgumentException("Parameter p must be greater than 2", nameof(p));
+        }
+        if (upperBound <= 2)
+        {
+            throw new ArgumentException("upperBound must be greater than 2", nameof(upperBound));
+        }
+
+        BigInteger result;
+        var bytes = new byte[upperBound.GetByteCount()];
+        do
+        {
+            rand.NextBytes(bytes);
+            result = new BigInteger(bytes, true) % upperBound;
+        }
+        while (BigInteger.GreatestCommonDivisor(result, p) != 1 || result < 2);
+
+        return result;
     }
 }
