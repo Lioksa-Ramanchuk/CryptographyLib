@@ -11,6 +11,7 @@ public static class ImageSteganography
     public static void InjectMessageByRows(string containerPath, byte[] message, string outputImagePath)
     {
         using Bitmap container = new(containerPath);
+        message = [..message, 0];
         int maxMessageBits = container.Width * container.Height * 3;
         if (message.Length * 8 > maxMessageBits)
             throw new ArgumentOutOfRangeException(nameof(message), "The message is too long for the given container");
@@ -73,6 +74,7 @@ public static class ImageSteganography
     public static void InjectMessageByColumns(string containerPath, byte[] message, string outputImagePath)
     {
         using Bitmap container = new(containerPath);
+        message = [..message, 0];
         int maxMessageBits = container.Width * container.Height * 3;
         if (message.Length * 8 > maxMessageBits)
             throw new ArgumentOutOfRangeException(nameof(message), "The message is too long for the given container.");
