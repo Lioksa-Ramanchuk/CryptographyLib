@@ -170,7 +170,7 @@ public static class ImageSteganography
         }
     }
 
-    public static void BuildColorMatrix(string imagePath, string outputPath)
+    public static void BuildLSBMap(string imagePath, string outputPath)
     {
         using Bitmap originalImage = new(imagePath);
         Bitmap newImage = new(originalImage.Width, originalImage.Height);

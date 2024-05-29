@@ -4,11 +4,8 @@ namespace CryptographyLib;
 
 public class Knapsack(BigInteger[] d, BigInteger a, BigInteger n) : AsymmetricCipher<BigInteger>
 {
-    public BigInteger A { get; } = a;
-    public BigInteger InversedA { get; } = Arithmetic.ModInverse(a, n);
-    public BigInteger N { get; } = n;
-    public BigInteger[] D { get; } = d;
-    public BigInteger[] E { get; } = Arithmetic.GenerateNormalSequence(d, a, n);
+    private readonly BigInteger _aInversed = Arithmetic.ModInverse(a, n);
+    private readonly BigInteger[] e = Arithmetic.GenerateNormalSequence(d, a, n);
 
     public override BigInteger[] Encrypt(byte[] text)
     {
@@ -20,7 +17,7 @@ public class Knapsack(BigInteger[] d, BigInteger a, BigInteger n) : AsymmetricCi
             {
                 if ((text[iByte] & (1 << iBit)) != 0)
                 {
-                    encrypted[iByte] += E[^(iBit + 1)];
+                    encrypted[iByte] += e[^(iBit + 1)];
                 }
             }
         }
@@ -29,7 +26,7 @@ public class Knapsack(BigInteger[] d, BigInteger a, BigInteger n) : AsymmetricCi
 
     public override byte[] Decrypt(BigInteger[] encrypted)
     {
-        var weights = encrypted.Select(c => c * InversedA % N).ToArray();
+        var weights = encrypted.Select(c => c * _aInversed % n).ToArray();
 
         var decrypted = new byte[weights.Length];
         for (int iByte = 0; iByte < decrypted.Length; ++iByte)
@@ -37,7 +34,7 @@ public class Knapsack(BigInteger[] d, BigInteger a, BigInteger n) : AsymmetricCi
             decrypted[iByte] = 0;
             for (int iBit = 0; iBit < 8; ++iBit)
             {
-                var subWeight = D[^(iBit + 1)];
+                var subWeight = d[^(iBit + 1)];
                 if (weights[iByte] >= subWeight)
                 {
                     weights[iByte] -= subWeight;

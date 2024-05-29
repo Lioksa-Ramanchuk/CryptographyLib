@@ -2,30 +2,15 @@ namespace CryptographyLib;
 
 public class RC4 : StreamCipher
 {
-    private byte[] _key = null!;
+    private readonly byte[] _key;
     private byte[] _s = null!;
     private int _i = 0;
     private int _j = 0;
 
     public RC4(byte[] key)
     {
-        Key = key;
-    }
-
-    public byte[] Key
-    {
-        get => _key;
-        set
-        {
-            _key = value;
-            _s = Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
-            for (int i = 0, j = 0; i < 256; ++i)
-            {
-                j = (j + _s[i] + _key[i % _key.Length]) % 256;
-                (_s[i], _s[j]) = (_s[j], _s[i]);
-            }
-            _i = _j = 0;
-        }
+        _key = key;
+        Reset();
     }
 
     public override byte[] Encrypt(byte[] text)
@@ -48,6 +33,12 @@ public class RC4 : StreamCipher
 
     public void Reset()
     {
-        Key = _key;
+        _s = Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
+        for (int i = 0, j = 0; i < 256; ++i)
+        {
+            j = (j + _s[i] + _key[i % _key.Length]) % 256;
+            (_s[i], _s[j]) = (_s[j], _s[i]);
+        }
+        _i = _j = 0;
     }
 }

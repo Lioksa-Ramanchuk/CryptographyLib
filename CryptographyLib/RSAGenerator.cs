@@ -7,18 +7,14 @@ using System.Numerics;
 public class RSAGenerator(BigInteger p, BigInteger q, BigInteger e, BigInteger x0)
     : IEnumerable<BigInteger>
 {
-    public BigInteger Q { get; } = q;
-    public BigInteger P { get; } = p;
-    public BigInteger E { get; } = e;
-    public BigInteger N { get; } = BigInteger.Multiply(p, q);
-    public BigInteger X0 { get; set; } = x0;
+    private readonly BigInteger n = BigInteger.Multiply(p, q);
 
     public IEnumerator<BigInteger> GetEnumerator()
     {
         while (true)
         {
-            X0 = BigInteger.ModPow(X0, E, N);
-            yield return X0;
+            x0 = BigInteger.ModPow(x0, e, n);
+            yield return x0;
         }
     }
 
@@ -29,17 +25,17 @@ public class RSAGenerator(BigInteger p, BigInteger q, BigInteger e, BigInteger x
 
     public void ValidateState()
     {
-        if (!Arithmetic.IsPrime(P) || !Arithmetic.IsPrime(Q))
+        if (!Arithmetic.IsPrime(p) || !Arithmetic.IsPrime(q))
         {
             throw new ArgumentException("p and q must be prime numbers.");
         }
 
-        if (N != BigInteger.Multiply(P, Q))
+        if (n != BigInteger.Multiply(p, q))
         {
             throw new ArgumentException("n must be the product of p and q.");
         }
 
-        if (BigInteger.GreatestCommonDivisor(E, BigInteger.Multiply(P - 1, Q - 1)) != 1)
+        if (BigInteger.GreatestCommonDivisor(e, BigInteger.Multiply(p - 1, q - 1)) != 1)
         {
             throw new ArgumentException("e must be coprime with (p-1)*(q-1).");
         }

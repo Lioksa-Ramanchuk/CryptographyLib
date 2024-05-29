@@ -206,15 +206,10 @@ public class DES : ByteCipher
         }
     }
 
-    public double CalculateAvalanche(byte[] text1, byte[] text2)
+    public static double CalculateAvalanche(byte[] encrypted1, byte[] encrypted2)
     {
-        var encrypted1 = Encrypt(text1);
-        var encrypted2 = Encrypt(text2);
-
-        int differingBits = new BitArray(encrypted1).Xor(new BitArray(encrypted2)).CountOnes();
-
-        double totalBits = encrypted1.Length * 8;
-        return 100.0 * differingBits / totalBits;
+        var xored = new BitArray(encrypted1).Xor(new BitArray(encrypted2));
+        return 100.0 * xored.CountOnes() / xored.Count;
     }
     private static void ValidateKey(byte[] key)
     {

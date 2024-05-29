@@ -9,12 +9,12 @@ public class RSA(BigInteger p, BigInteger q, BigInteger e) : AsymmetricCipher<Bi
 
     public override BigInteger[] Encrypt(byte[] text)
     {
-        return [..text.Select(m => BigInteger.ModPow(new(m), e, n))];
+        return [.. text.Select(m => BigInteger.ModPow(new(m), e, n))];
     }
 
     public override byte[] Decrypt(BigInteger[] encrypted)
     {
-        return [..encrypted.Select(c => (byte)BigInteger.ModPow(c, d, n))];
+        return [.. encrypted.Select(c => (byte)BigInteger.ModPow(c, d, n))];
     }
 
     protected override void EncryptingFile(BinaryReader reader, BinaryWriter writer, Func<byte[], BigInteger[]> encryptBuf, int bufSize = 1024)
