@@ -170,9 +170,8 @@ public static class Arithmetic
         return s;
     }
 
-    public static BigInteger[] GenerateSuperincreasingSequence(int n, int minBits = 100)
+    public static BigInteger[] GenerateSuperincreasingSequence(this Random rand, int n, int minBits = 100)
     {
-        Random rand = new();
         var seq = new BigInteger[n];
         BigInteger sum = 0;
         byte[] randomBytes;
